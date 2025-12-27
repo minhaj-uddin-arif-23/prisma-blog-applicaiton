@@ -20,10 +20,15 @@ model Post {
   content    String     @db.Text
   isFeatured Boolean    @default(false)
   views      Int        @default(0)
+  authorId   String
   tags       String[]
   createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
   status     PostStatus @default(PUBLISHED)
+  comments   Comment[]
+
+  @@index([authorId])
+  @@map("posts")
 }
 
 enum PostStatus {
@@ -32,15 +37,23 @@ enum PostStatus {
   ARCHIVED
 }
 
+// 1 comment has multiple reply that's way self relation 
 model Comment {
   id        String        @id @default(uuid())
   content   String        @db.Text
   authorId  String
   postId    String
+  post      Post          @relation(fields: [postId], references: [id])
   parentId  String?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[]     @relation("CommentReplies")
   status    CommentStatus @default(APPROVE)
   createdAt DateTime      @default(now())
-  updatedAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
+  @@map("comments")
 }
 
 enum CommentStatus {
