@@ -3,9 +3,16 @@ import { PostService } from "./post.service";
 
 const postController = {
   createPost: async (req: Request, res: Response) => {
-    // console.log("Request Body:", req.body);
     try {
-      const postData = await PostService.postService(req.body);
+      const user = req?.user
+      if(!user){
+        return res.status(400).json({
+          success:false,
+          message:'Not valid id found'
+        })
+      }
+      console.log("Requested user:", req.user);
+      const postData = await PostService.postService(req.body, user?.id as string);
       return res.status(201).json(postData);
     } catch (error) {
       console.error("Error creating post:", error);

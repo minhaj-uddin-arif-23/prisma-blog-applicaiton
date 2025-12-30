@@ -1,8 +1,16 @@
 import { Router } from "express";
 import { PostController } from "./post.controller";
+import authMiddleware, { UserRole } from "../../middleware/auth";
+
 const router = Router();
 
-router.post("/addPost", PostController.postController.createPost);
+
+
+router.post(
+  "/addPost",
+  authMiddleware(UserRole.USER),
+  PostController.postController.createPost
+);
 router.get("/", PostController.getController.getAllPosts);
 router.get("/:id", PostController.getPostById);
 router.delete("/:id", PostController.deletePostById);

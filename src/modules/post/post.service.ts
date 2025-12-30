@@ -1,10 +1,14 @@
 import { prisma } from "../../lib/prisma";
 import { Post } from "../../../generated/prisma/client";
 const postService = async (
-  data: Omit<Post, "id" | "createdAt" | "updatedAt">
+  data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
+  userId: string
 ) => {
   const post = await prisma.post.create({
-    data,
+    data: {
+      ...data,
+      authorId: userId,
+    },
   });
   return post;
 };
