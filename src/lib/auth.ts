@@ -40,17 +40,28 @@ export const auth = betterAuth({
     autoSignIn: false,
     requireEmailVerification: true,
   },
+  // google sign-in/sign-up
+  socialProviders: {
+    google: {
+      prompt:'select_account consent',
+      accessType:'offline',
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
   emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification:true,
     sendVerificationEmail: async ({ user, url, token }, request) => {
       console.log({ user, url, token });
-      
+
       try {
         const veryficationEmail = `${process.env.APP_URL}/verify-email?token=${token}`;
-      const info = await transporter.sendMail({
-        from: '"Prisma Auth" <no-reply@yourdomain.com>',
-        to: user.email,
-        subject: "Confirm Your Email Address",
-        text: `
+        const info = await transporter.sendMail({
+          from: '"Prisma Auth" <no-reply@yourdomain.com>',
+          to: user.email,
+          subject: "Confirm Your Email Address",
+          text: `
 Welcome to ${user.name},
 
 Please verify your email address by visiting the link below:
@@ -62,7 +73,7 @@ If you did not create an account, no action is required.
 
 — Prisma Auth Team
 `,
-        html: `
+          html: `
 <!DOCTYPE html>
 <html>
   <body style="margin:0; padding:0; background:#0f172a;">
@@ -212,10 +223,10 @@ If you did not create an account, no action is required.
   </body>
 </html>
   `,
-      });
+        });
       } catch (error) {
-        console.error('somthing wrong')
-        throw new Error
+        console.error("somthing wrong");
+        throw new Error();
       }
     },
   },
