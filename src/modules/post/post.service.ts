@@ -16,6 +16,7 @@ const postService = async (
 const getAllPosts = async (payload: { search: string | undefined }) => {
   // console.log('payload -> ', payload)
   const posts = await prisma.post.findMany({
+    // multiple search with different parameter use or
     where: {
       OR: [
         {
@@ -32,6 +33,7 @@ const getAllPosts = async (payload: { search: string | undefined }) => {
           },
         },
         {
+          // if search with array use has 
           tags:{
             has:payload.search as string
           }
