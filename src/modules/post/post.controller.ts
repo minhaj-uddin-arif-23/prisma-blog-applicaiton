@@ -26,6 +26,10 @@ const getController = {
     try {
       const {search} = req.query
       const searchString = typeof search === "string"? search  : undefined
+      // if(!searchString){
+      //        res.status(40).json({ message: "No valid data found" });
+
+      // }
       console.log('query search ->', searchString)
       const posts = await PostService.getAllPosts({search: searchString});
       return res.status(200).json(posts);
