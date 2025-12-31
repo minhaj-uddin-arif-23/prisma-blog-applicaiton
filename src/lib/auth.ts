@@ -1,3 +1,4 @@
+// Better auth , user authentication setup, with extra functionality added and implement email send using nodemailer
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";

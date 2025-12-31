@@ -24,7 +24,10 @@ const postController = {
 const getController = {
   getAllPosts: async (req: Request, res: Response) => {
     try {
-      const posts = await PostService.getAllPosts();
+      const {search} = req.query
+      const searchString = typeof search === "string"? search  : undefined
+      console.log('query search ->', searchString)
+      const posts = await PostService.getAllPosts({search: searchString});
       return res.status(200).json(posts);
     } catch (error) {
       console.error("Error fetching posts:", error);

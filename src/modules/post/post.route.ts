@@ -5,13 +5,13 @@ import authMiddleware, { UserRole } from "../../middleware/auth";
 const router = Router();
 
 
+router.get("/", PostController.getController.getAllPosts);
 
 router.post(
   "/addPost",
   authMiddleware(UserRole.USER),
   PostController.postController.createPost
 );
-router.get("/", PostController.getController.getAllPosts);
 router.get("/:id", PostController.getPostById);
 router.delete("/:id", PostController.deletePostById);
 
