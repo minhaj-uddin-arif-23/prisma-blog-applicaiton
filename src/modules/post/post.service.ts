@@ -1,5 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import { Post } from "../../../generated/prisma/client";
+import { PostWhereInput } from "../../../generated/prisma/models";
 const postService = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
   userId: string
@@ -13,32 +14,55 @@ const postService = async (
   return post;
 };
 // get all posts
-const getAllPosts = async (payload: { search: string | undefined }) => {
+const getAllPosts = async ({
+  search,
+  tags,
+}: {
+  search: string | undefined;
+  tags: string[] | [];
+}) => {
   // console.log('payload -> ', payload)
-  const posts = await prisma.post.findMany({
-    // multiple search with different parameter use or
-    where: {
+
+  const andCondition: PostWhereInput[] = [];
+  if (search) {
+    // multiple array search
+    andCondition.push({
       OR: [
         {
           title: {
-            contains: payload.search as string,
+            contains: search as string,
             mode: "insensitive",
           },
         },
 
         {
           content: {
-            contains: payload.search as string,
+            contains: search as string,
             mode: "insensitive",
           },
         },
         {
-          // if search with array use has 
-          tags:{
-            has:payload.search as string
-          }
-        }
+          // if search with array use [has] ,[note:single array search]
+          tags: {
+            has: search as string,
+          },
+        },
       ],
+    });
+  }
+  // tags
+  if (tags.length > 0) {
+    andCondition.push({
+      tags: {
+        hasEvery: tags as string[],
+      },
+    });
+  }
+
+  const posts = await prisma.post.findMany({
+    // multiple search with different parameter use or
+    where: {
+      AND: andCondition,
     },
   });
   return posts;

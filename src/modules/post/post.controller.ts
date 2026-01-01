@@ -26,12 +26,14 @@ const getController = {
     try {
       const {search} = req.query
       const searchString = typeof search === "string"? search  : undefined
+      const tags = req.query.tags ? (req.query.tags as string).split(",")  : []
+      
       // if(!searchString){
       //        res.status(40).json({ message: "No valid data found" });
 
       // }
       console.log('query search ->', searchString)
-      const posts = await PostService.getAllPosts({search: searchString});
+      const posts = await PostService.getAllPosts({search: searchString,tags});
       return res.status(200).json(posts);
     } catch (error) {
       console.error("Error fetching posts:", error);
