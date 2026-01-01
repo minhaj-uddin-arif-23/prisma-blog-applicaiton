@@ -1,18 +1,28 @@
 import type { Request, Response } from "express";
 import { PostService } from "./post.service";
+import { PostStatus } from "../../../generated/prisma/enums";
 
+/*
+👉 Controller শুধু:
+    input নেবে
+    validate করবে
+    service call করবে
+*/
 const postController = {
   createPost: async (req: Request, res: Response) => {
     try {
-      const user = req?.user
-      if(!user){
+      const user = req?.user;
+      if (!user) {
         return res.status(400).json({
-          success:false,
-          message:'Not valid id found'
-        })
+          success: false,
+          message: "Not valid id found",
+        });
       }
       console.log("Requested user:", req.user);
-      const postData = await PostService.postService(req.body, user?.id as string);
+      const postData = await PostService.postService(
+        req.body,
+        user?.id as string
+      );
       return res.status(201).json(postData);
     } catch (error) {
       console.error("Error creating post:", error);
@@ -21,19 +31,129 @@ const postController = {
   },
 };
 
+/*
+** update version and effective  
 const getController = {
   getAllPosts: async (req: Request, res: Response) => {
     try {
-      const {search} = req.query
-      const searchString = typeof search === "string"? search  : undefined
-      const tags = req.query.tags ? (req.query.tags as string).split(",")  : []
-      
-      // if(!searchString){
-      //        res.status(40).json({ message: "No valid data found" });
+      const { search, tags, isFeatured, status, authorId } = req.query;
 
-      // }
-      console.log('query search ->', searchString)
-      const posts = await PostService.getAllPosts({search: searchString,tags});
+      // 🔒 search validation
+      if (search && typeof search === "string" && search.length > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "Search query too long",
+        });
+      }
+
+      // 🔒 tags validation
+      let tagArray: string[] = [];
+      if (tags) {
+        if (typeof tags !== "string") {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid tags format",
+          });
+        }
+
+        tagArray = tags.split(",");
+        if (tagArray.length > 5) {
+          return res.status(400).json({
+            success: false,
+            message: "Too many tags provided",
+          });
+        }
+      }
+
+      // 🔒 isFeatured validation
+      if (
+        isFeatured &&
+        isFeatured !== "true" &&
+        isFeatured !== "false"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid isFeatured value",
+        });
+      }
+
+      // 🔒 status validation
+      if (
+        status &&
+        !Object.values(PostStatus).includes(status as PostStatus)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid post status",
+        });
+      }
+
+      // 🔒 authorId basic safety
+      if (authorId && typeof authorId !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid authorId",
+        });
+      }
+
+      const posts = await PostService.getAllPosts({
+        search: search as string | undefined,
+        tags: tagArray,
+        isFeatured:
+          isFeatured === "true"
+            ? true
+            : isFeatured === "false"
+            ? false
+            : undefined,
+        status: status as PostStatus,
+        authorId: authorId as string | undefined,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Posts fetched successfully",
+        data: posts,
+      });
+    } catch (error) {
+      console.error("GET_POSTS_ERROR:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+};
+
+
+*/
+
+const getController = {
+  getAllPosts: async (req: Request, res: Response) => {
+    try {
+      const { search } = req.query;
+      const searchString = typeof search === "string" ? search : undefined;
+      const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+      const isFeatured = req.query.isFeatured
+        ? req.query.isFeatured === "true"
+          ? true
+          : req.query.isFeatured === "false"
+          ? false
+          : undefined
+        : undefined;
+      const status = req.query.status as PostStatus;
+      const authorId = req.query.authorId as string;
+      console.log({ authorId });
+      // console.log({ isFeatured });
+
+      // console.log("query search ->", searchString);
+      const posts = await PostService.getAllPosts({
+        search: searchString,
+        tags,
+        isFeatured,
+        status,
+        authorId,
+      });
       return res.status(200).json(posts);
     } catch (error) {
       console.error("Error fetching posts:", error);

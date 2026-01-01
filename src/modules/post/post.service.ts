@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { Post } from "../../../generated/prisma/client";
+import { Post, PostStatus } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 const postService = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
@@ -13,17 +13,81 @@ const postService = async (
   });
   return post;
 };
+/*
+const getAllPosts = async ({
+  search,
+  tags,
+  isFeatured,
+  status,
+  authorId,
+}: {
+  search?: string;
+  tags: string[];
+  isFeatured?: boolean;
+  status?: PostStatus;
+  authorId?: string;
+}) => {
+  try {
+    const andCondition: PostWhereInput[] = [];
+
+    if (search) {
+      andCondition.push({
+        OR: [
+          { title: { contains: search, mode: "insensitive" } },
+          { content: { contains: search, mode: "insensitive" } },
+          { tags: { has: search } },
+        ],
+      });
+    }
+
+    if (tags.length > 0) {
+      andCondition.push({
+        tags: { hasEvery: tags },
+      });
+    }
+
+    if (typeof isFeatured === "boolean") {
+      andCondition.push({ isFeatured });
+    }
+
+    if (status) {
+      andCondition.push({ status });
+    }
+
+    if (authorId) {
+      andCondition.push({ authorId });
+    }
+
+    return await prisma.post.findMany({
+      where: { AND: andCondition },
+    });
+  } catch (error) {
+    console.error("POST_SERVICE_DB_ERROR:", error);
+    throw new Error("Failed to fetch posts from database");
+  }
+};
+
+
+*/
+
 // get all posts
 const getAllPosts = async ({
   search,
   tags,
+  isFeatured,
+  status,
+  authorId,
 }: {
   search: string | undefined;
   tags: string[] | [];
+  isFeatured: boolean | undefined;
+  status: PostStatus;
+  authorId: string | undefined;
 }) => {
   // console.log('payload -> ', payload)
 
   const andCondition: PostWhereInput[] = [];
+  // search
   if (search) {
     // multiple array search
     andCondition.push({
@@ -58,7 +122,21 @@ const getAllPosts = async ({
       },
     });
   }
-
+  // isFeatured
+  if (typeof isFeatured === "boolean") {
+    andCondition.push({ isFeatured });
+  }
+  // status
+  if (typeof status === "string") {
+    andCondition.push({ status });
+  }
+  // authorId
+  if (authorId) {
+    // console.log(authorId);
+    andCondition.push({
+      authorId,
+    });
+  }
   const posts = await prisma.post.findMany({
     // multiple search with different parameter use or
     where: {
