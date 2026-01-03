@@ -114,7 +114,7 @@ const getAllPosts = async ({
       ],
     });
   }
-  // tags
+  //multiple array tags
   if (tags.length > 0) {
     andCondition.push({
       tags: {
