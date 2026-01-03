@@ -178,14 +178,15 @@ const getController = {
 };
 // get single post by id
 const getPostById = async (req: Request, res: Response) => {
-  const { id } = req.params;
   try {
-    const post = await PostService.getPostById(id as string);
-    if (post) {
-      return res.status(200).json(post);
-    } else {
-      return res.status(404).json({ message: "Post not found" });
+    console.log("get id ");
+    const { id } = req.params;
+    if (!id) {
+      throw new Error("ID NOT FOUND");
     }
+    const post = await PostService.getPostById(id as string);
+
+    return res.status(200).json(post);
   } catch (error) {}
 };
 // delete

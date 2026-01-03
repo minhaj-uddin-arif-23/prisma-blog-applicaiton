@@ -180,11 +180,25 @@ const getAllPosts = async ({
   };
 };
 // get post by id
+// use transaction function to handle better response to data
 const getPostById = async (id: string) => {
-  const getSinglePost = await prisma.post.findUnique({
-    where: { id },
+  return await prisma.$transaction(async (txf) => {
+    await txf.post.update({
+      where: {
+        id: id,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+
+    const getSinglePost = await txf.post.findUnique({
+      where: { id },
+    });
+    return getSinglePost;
   });
-  return getSinglePost;
 };
 
 // delete single post
