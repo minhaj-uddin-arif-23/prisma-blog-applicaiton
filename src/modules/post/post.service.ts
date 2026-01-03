@@ -77,12 +77,16 @@ const getAllPosts = async ({
   isFeatured,
   status,
   authorId,
+  page,
+  limit,
 }: {
   search: string | undefined;
   tags: string[] | [];
   isFeatured: boolean | undefined;
   status: PostStatus;
   authorId: string | undefined;
+  page: number;
+  limit: number;
 }) => {
   // console.log('payload -> ', payload)
 
@@ -137,7 +141,12 @@ const getAllPosts = async ({
       authorId,
     });
   }
+  // page & limit
+  const skip = (page - 1) * limit;
+  const take = limit;
   const posts = await prisma.post.findMany({
+    skip,
+    take: limit,
     // multiple search with different parameter use or
     where: {
       AND: andCondition,

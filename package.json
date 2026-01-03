@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "npx tsx watch src/server.ts"
+    "dev": "npx tsx watch src/server.ts",
+    "seed:admin":"npx tsx src/adminScript/addAdmin.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
