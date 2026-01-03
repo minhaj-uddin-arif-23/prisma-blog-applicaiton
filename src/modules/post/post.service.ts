@@ -89,8 +89,8 @@ const getAllPosts = async ({
   authorId: string | undefined;
   page: number;
   limit: number;
-  sortBy: string | undefined;
-  sortOrder: string | undefined;
+  sortBy: string;
+  sortOrder: string;
 }) => {
   // console.log('payload -> ', payload)
 
@@ -155,14 +155,29 @@ const getAllPosts = async ({
     where: {
       AND: andCondition,
     },
-    orderBy:
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : { createdAt: "desc" },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
   });
-  return posts;
+  // count total data
+  const total = await prisma.post.count({
+    where: {
+      AND: andCondition,
+    },
+  });
+  // how many page occur to show all data
+  // total = 13, limit = 4, totalData = (total/limit) = 3.5 = 4
+  const totalPage = Math.ceil(total / limit);
+  console.log({ totalPage });
+  return {
+    data: posts,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPage,
+    },
+  };
 };
 // get post by id
 const getPostById = async (id: string) => {
