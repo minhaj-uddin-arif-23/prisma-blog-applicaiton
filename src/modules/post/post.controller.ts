@@ -1,6 +1,8 @@
+import { SortOrder } from "./../../../generated/prisma/internal/prismaNamespaceBrowser";
 import type { Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
+import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 
 /*
 👉 Controller শুধু:
@@ -146,9 +148,13 @@ const getController = {
       // console.log({ authorId });
 
       // page & limit
-      const page = Number(req.query.page) || 1;
-      const limit = Number(req.query.limit) || 4;
-      console.log({ page, limit });
+
+      // console.log({ sortBy, sortOrder });
+      const { page, limit, sortBy, sortOrder } = paginationSortingHelper(
+        req.query
+      );
+      console.log({ page, limit, sortBy, sortOrder });
+      // console.log({ page, limit });
       // console.log({ isFeatured });
 
       // console.log("query search ->", searchString);
@@ -160,6 +166,8 @@ const getController = {
         authorId,
         page,
         limit,
+        sortBy,
+        sortOrder,
       });
       return res.status(200).json(posts);
     } catch (error) {

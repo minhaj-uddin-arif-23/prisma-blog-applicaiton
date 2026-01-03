@@ -79,6 +79,8 @@ const getAllPosts = async ({
   authorId,
   page,
   limit,
+  sortBy,
+  sortOrder,
 }: {
   search: string | undefined;
   tags: string[] | [];
@@ -87,6 +89,8 @@ const getAllPosts = async ({
   authorId: string | undefined;
   page: number;
   limit: number;
+  sortBy: string | undefined;
+  sortOrder: string | undefined;
 }) => {
   // console.log('payload -> ', payload)
 
@@ -151,6 +155,12 @@ const getAllPosts = async ({
     where: {
       AND: andCondition,
     },
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : { createdAt: "desc" },
   });
   return posts;
 };
