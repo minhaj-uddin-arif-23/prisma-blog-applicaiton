@@ -1,5 +1,9 @@
 import { prisma } from "../../lib/prisma";
-import { Post, PostStatus } from "../../../generated/prisma/client";
+import {
+  CommentStatus,
+  Post,
+  PostStatus,
+} from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 const postService = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
@@ -196,6 +200,32 @@ const getPostById = async (id: string) => {
 
     const getSinglePost = await txf.post.findUnique({
       where: { id },
+      include: {
+        comments: {
+          where: {
+            parentId: null,
+            status: CommentStatus.APPROVE,
+          },
+          include: {
+            replies: {
+              include: {
+                replies: {
+                  where: {
+                    status: CommentStatus.APPROVE,
+                  },
+                  include: {
+                    replies: {
+                      where: {
+                        status: CommentStatus.APPROVE,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     return getSinglePost;
   });

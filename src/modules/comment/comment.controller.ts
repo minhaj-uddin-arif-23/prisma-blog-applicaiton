@@ -10,7 +10,7 @@ const commentCreate = {
       return res.status(201).json({ commentData });
     } catch (error) {
       //   console.error("comment creating post:");
-      res.status(500).json({ message: "comment creating post" });
+      res.status(500).json({ success: false, message: error });
     }
   },
 };
