@@ -153,7 +153,7 @@ const getController = {
       const { page, limit, sortBy, sortOrder } = paginationSortingHelper(
         req.query
       );
-      console.log({ page, limit, sortBy, sortOrder });
+      // console.log({ page, limit, sortBy, sortOrder });
       // console.log({ page, limit });
       // console.log({ isFeatured });
 
