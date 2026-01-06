@@ -42,8 +42,27 @@ const singleCommentGetAuthor = {
   },
 };
 
+// update comment
+const updateCommentData = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { commentId } = req.params;
+    const data = await commentService.updateComment(
+      commentId as string,
+      req.body,
+      user?.id as string
+    );
+    console.log({ user, commentId, data });
+    console.log({ data });
+    return res.status(201).json({ data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
 export const commentController = {
   commentCreate,
   singleCommentGet,
   singleCommentGetAuthor,
+  updateCommentData,
 };

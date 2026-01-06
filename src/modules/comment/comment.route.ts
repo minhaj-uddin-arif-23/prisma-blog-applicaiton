@@ -7,7 +7,16 @@ router.get(
   "/author/:authorId",
   commentController.singleCommentGetAuthor.getCommentByIdAuthor
 );
-router.get("/:id", commentController.singleCommentGet.getCommentById);
+router.get(
+  "/:id",
+  authMiddleware(UserRole.ADMIN, UserRole.USER),
+  commentController.singleCommentGet.getCommentById
+);
+router.patch(
+  "/:commentId",
+  authMiddleware(UserRole.ADMIN, UserRole.USER),
+  commentController.updateCommentData
+);
 router.post(
   "/",
   authMiddleware(UserRole.USER, UserRole.ADMIN),

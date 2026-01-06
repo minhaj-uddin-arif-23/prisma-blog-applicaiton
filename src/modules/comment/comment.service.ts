@@ -1,3 +1,4 @@
+import { CommentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
 const createComment = async (payload: {
@@ -63,8 +64,40 @@ const getCommentByIdAuthor = async (authorId: string) => {
   });
 };
 
+// update comment
+//authorId,data, commentId
+const updateComment = async (
+  commentId: string,
+  data: { content: string; status?: CommentStatus },
+  authorId: string
+) => {
+  // check comment exist or authorId
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      authorId: authorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!commentData) {
+    throw new Error("comment data not found");
+  }
+  console.log({ commentId, data, authorId });
+
+  return await prisma.comment.update({
+    where: {
+      id: commentId,
+      authorId: authorId,
+    },
+    data,
+  });
+};
+
 export const commentService = {
   createComment,
   getCommentById,
   getCommentByIdAuthor,
+  updateComment,
 };
