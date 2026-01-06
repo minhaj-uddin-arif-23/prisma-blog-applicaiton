@@ -179,7 +179,7 @@ const getController = {
 // get single post by id
 const getPostById = async (req: Request, res: Response) => {
   try {
-    console.log("get id ");
+    // console.log("get id ");
     const { id } = req.params;
     if (!id) {
       throw new Error("ID NOT FOUND");
@@ -191,7 +191,7 @@ const getPostById = async (req: Request, res: Response) => {
 };
 // delete
 const deletePostById = async (req: Request, res: Response) => {
-  console.log("Delete request received");
+  // console.log("Delete request received");
   try {
     const { id } = req.params;
     const deletedPost = await PostService.deleteSinglePost(id as string);

@@ -162,6 +162,13 @@ const getAllPosts = async ({
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
   });
   // count total data
   const total = await prisma.post.count({
@@ -172,7 +179,7 @@ const getAllPosts = async ({
   // how many page occur to show all data
   // total = 13, limit = 4, totalData = (total/limit) = 3.5 = 4
   const totalPage = Math.ceil(total / limit);
-  console.log({ totalPage });
+  // console.log({ totalPage });
   return {
     data: posts,
     pagination: {
@@ -206,6 +213,9 @@ const getPostById = async (id: string) => {
             parentId: null,
             status: CommentStatus.APPROVE,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
           include: {
             replies: {
               include: {
@@ -213,6 +223,7 @@ const getPostById = async (id: string) => {
                   where: {
                     status: CommentStatus.APPROVE,
                   },
+
                   include: {
                     replies: {
                       where: {
@@ -223,6 +234,11 @@ const getPostById = async (id: string) => {
                 },
               },
             },
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
           },
         },
       },
