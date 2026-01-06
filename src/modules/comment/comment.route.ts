@@ -3,6 +3,10 @@ import { commentController } from "./comment.controller";
 import authMiddleware, { UserRole } from "../../middleware/auth";
 
 const router = Router();
+router.get(
+  "/author/:authorId",
+  commentController.singleCommentGetAuthor.getCommentByIdAuthor
+);
 router.get("/:id", commentController.singleCommentGet.getCommentById);
 router.post(
   "/",

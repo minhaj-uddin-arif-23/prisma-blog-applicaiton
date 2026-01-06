@@ -48,7 +48,23 @@ const getCommentById = async (id: string) => {
     },
   });
 };
+// get author by id
+const getCommentByIdAuthor = async (authorId: string) => {
+  // console.log("author id ", authorId);
+  // get particular ( author/user ) comment one or many
+  return await prisma.comment.findMany({
+    where: {
+      authorId,
+    },
+    // each comment which post belong
+    include: {
+      post: true,
+    },
+  });
+};
+
 export const commentService = {
   createComment,
   getCommentById,
+  getCommentByIdAuthor,
 };
