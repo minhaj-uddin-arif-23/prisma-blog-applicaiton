@@ -52,8 +52,22 @@ const updateCommentData = async (req: Request, res: Response) => {
       req.body,
       user?.id as string
     );
-    console.log({ user, commentId, data });
-    console.log({ data });
+    // console.log({ user, commentId, data });
+    // console.log({ data });
+    return res.status(201).json({ data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+const moderateCommentData = async (req: Request, res: Response) => {
+  try {
+    const { commentId } = req.params;
+    const data = await commentService.moderateComment(
+      commentId as string,
+      req.body
+    );
+
     return res.status(201).json({ data });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error });
@@ -65,4 +79,5 @@ export const commentController = {
   singleCommentGet,
   singleCommentGetAuthor,
   updateCommentData,
+  moderateCommentData,
 };

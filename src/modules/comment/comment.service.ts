@@ -84,7 +84,7 @@ const updateComment = async (
   if (!commentData) {
     throw new Error("comment data not found");
   }
-  console.log({ commentId, data, authorId });
+  // console.log({ commentId, data, authorId });
 
   return await prisma.comment.update({
     where: {
@@ -95,9 +95,41 @@ const updateComment = async (
   });
 };
 
+// Admin Comment Status Management
+const moderateComment = async (
+  commentId: string,
+  data: { status: CommentStatus }
+) => {
+  // check comment exist or authorId
+  // only admin can moderate comment , so no need to check authorId or admin id
+
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  if (!commentData) {
+    throw new Error("comment data not found");
+  }
+  // console.log({ commentId, data, authorId });
+
+  return await prisma.comment.update({
+    where: {
+      id: commentId,
+    },
+    data: {
+      status: data.status,
+    },
+  });
+};
+
 export const commentService = {
   createComment,
   getCommentById,
   getCommentByIdAuthor,
   updateComment,
+  moderateComment,
 };
