@@ -318,7 +318,8 @@ const getMyPostById = async (authorId: string) => {
 const updatePostData = async (
   postId: string,
   data: Partial<Post>,
-  authorId: string
+  authorId: string,
+  isAdmin: boolean
 ) => {
   // console.log({ postId, data, authorId });
   const postData = await prisma.post.findUniqueOrThrow({
@@ -331,12 +332,17 @@ const updatePostData = async (
     },
   });
 
-  // check author id
-  if (postData.authorId !== authorId) {
+  // check author id admin also edit post
+  if (!isAdmin && postData.authorId !== authorId) {
     throw new Error(
       "You are not creator on this post . so you can not update this post"
     );
   }
+
+  if (!isAdmin) {
+    delete data.isFeatured;
+  }
+
   const result = await prisma.post.update({
     where: {
       id: postId,
