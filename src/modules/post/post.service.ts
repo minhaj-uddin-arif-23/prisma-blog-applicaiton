@@ -260,9 +260,96 @@ const deleteSinglePost = async (id: string) => {
     // return deletedPost;
   });
 };
+
+// * get my post
+const getMyPostById = async (authorId: string) => {
+  // * only active user user data get
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: authorId,
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+    },
+  });
+  console.log({ authorId });
+  const result = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    // each post , show me how many comment exist
+    include: {
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+  // count also post
+  const totalPost = await prisma.post.aggregate({
+    _count: {
+      id: true,
+    },
+    where: {
+      authorId,
+    },
+  });
+  return {
+    data: result,
+    totalPost,
+  };
+};
+
+// * update post data
+/** 
+ * step
+   1. check post exist or not 
+   2. match the post creation(already database authorId) and new update(data) authorId must be same 
+   3. then update 
+   FETATURE
+   1.user update only own post , but one feature can't update [isFeatured]
+   2.not only user update their own post , admin can also update post
+ */
+const updatePostData = async (
+  postId: string,
+  data: Partial<Post>,
+  authorId: string
+) => {
+  // console.log({ postId, data, authorId });
+  const postData = await prisma.post.findUniqueOrThrow({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      authorId: true,
+    },
+  });
+
+  // check author id
+  if (postData.authorId !== authorId) {
+    throw new Error(
+      "You are not creator on this post . so you can not update this post"
+    );
+  }
+  const result = await prisma.post.update({
+    where: {
+      id: postId,
+    },
+    data,
+  });
+  return result;
+};
 export const PostService = {
   postService,
   getAllPosts,
   getPostById,
   deleteSinglePost,
+  getMyPostById,
+  updatePostData,
 };

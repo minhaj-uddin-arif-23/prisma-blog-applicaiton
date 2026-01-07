@@ -189,6 +189,27 @@ const getPostById = async (req: Request, res: Response) => {
     return res.status(200).json(post);
   } catch (error) {}
 };
+// * update user post data
+const updatePost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { postId } = req.params;
+    const data = await PostService.updatePostData(
+      postId as string,
+      req.body,
+      user?.id as string
+    );
+    return res.status(200).json({ data });
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : "comment updated failed";
+    res.status(400).json({ message: errorMessage });
+    return res.status(404).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
+};
 // delete
 const deletePostById = async (req: Request, res: Response) => {
   // console.log("Delete request received");
@@ -208,9 +229,38 @@ const deletePostById = async (req: Request, res: Response) => {
     });
   }
 };
+const getMyPost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    console.log({ user });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+    console.log({ user });
+    const myPost = await PostService.getMyPostById(user?.id as string);
+    // if(dele)
+    return res.status(200).json({
+      success: true,
+      post: myPost,
+      message: "Fetch my post Successfully",
+    });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(404).json({
+      success: false,
+      message: "Error deleting postsss",
+    });
+  }
+};
+
 export const PostController = {
   postController,
   getController,
   getPostById,
   deletePostById,
+  getMyPost,
+  updatePost,
 };

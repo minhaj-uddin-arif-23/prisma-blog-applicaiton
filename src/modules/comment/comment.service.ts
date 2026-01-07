@@ -116,7 +116,7 @@ const moderateComment = async (
     throw new Error("comment data not found");
   }
 
-  // if status already here no need to update
+  // if status already here? no need to update
 
   if (commentData.status === data.status) {
     throw new Error(`Status ${data.status} already exist. No need to update `);

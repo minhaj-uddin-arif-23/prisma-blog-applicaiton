@@ -28,18 +28,17 @@ const authMiddleware = (...roles: UserRole[]) => {
     const session = await betterAuth.api.getSession({
       headers: req.headers as any,
     });
- 
 
     // console.log(getSession);
     // check session and verified
     if (!session?.user) {
-     return res.status(403).json({
+      return res.status(403).json({
         success: false,
         message: "you are not authorized",
       });
     }
     if (!session?.user?.emailVerified) {
-     return res.status(403).json({
+      return res.status(403).json({
         success: false,
         message: "your email not verified",
       });
@@ -51,8 +50,8 @@ const authMiddleware = (...roles: UserRole[]) => {
       role: session?.user.role as string,
       emailVerified: session?.user.emailVerified as boolean,
     };
-       console.log("SESSION ROLE:", session.user.role);
-console.log("ALLOWED ROLES:", roles);
+    console.log("SESSION ROLE:", session.user.role);
+    console.log("ALLOWED ROLES:", roles);
     if (roles.length && !roles.includes(req.user?.role as UserRole)) {
       return res.status(403).json({
         success: false,
@@ -62,4 +61,4 @@ console.log("ALLOWED ROLES:", roles);
     next();
   };
 };
-export default authMiddleware
+export default authMiddleware;
