@@ -109,11 +109,19 @@ const moderateComment = async (
     },
     select: {
       id: true,
+      status: true,
     },
   });
   if (!commentData) {
     throw new Error("comment data not found");
   }
+
+  // if status already here no need to update
+
+  if (commentData.status === data.status) {
+    throw new Error(`Status ${data.status} already exist. No need to update `);
+  }
+
   // console.log({ commentId, data, authorId });
 
   return await prisma.comment.update({
