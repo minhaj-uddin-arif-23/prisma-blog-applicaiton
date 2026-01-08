@@ -430,7 +430,10 @@ const stateService = async () => {
           status: PostStatus.ARCHIVED,
         },
       }),
-      await tsx.post.count(),
+      // await tsx.post.count({}),
+      await tsx.post.aggregate({
+        _sum: { views: true },
+      }),
       await tsx.comment.count(),
       await tsx.comment.count({
         where: {
@@ -475,15 +478,17 @@ const stateService = async () => {
     ]);
 
     return {
-      totalPost: totalPostCount,
-      total_published_post: totalPublishdPost,
-      total_draft_post: totalDraftPost,
-      total_archived_post: totalARCHIVEDPost,
-      total_view_of_post: totalViewPost,
-      total_comment_count: totalCommentCount,
-      approve_comment: approveComment,
-      approve_comment_reply: approveCommentReply,
-      reject_comment: rejectComment,
+      post: {
+        totalPost: totalPostCount,
+        total_published_post: totalPublishdPost,
+        total_draft_post: totalDraftPost,
+        total_archived_post: totalARCHIVEDPost,
+        total_view_of_post: totalViewPost._sum.views || 0,
+        total_comment_count: totalCommentCount,
+        approve_comment: approveComment,
+        approve_comment_reply: approveCommentReply,
+        reject_comment: rejectComment,
+      },
       user: {
         totalUser: totalUser,
         totalAdminUser: totalAdminUser,

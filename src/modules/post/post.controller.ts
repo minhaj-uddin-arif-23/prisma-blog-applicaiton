@@ -291,7 +291,7 @@ const deletePost = async (req: Request, res: Response) => {
 const statePost = async (req: Request, res: Response) => {
   try {
     const data = await PostService.stateService();
-    return res.status(200).json({ data });
+    return res.status(200).json({ data: data });
   } catch (error: any) {
     const errorMessage =
       error instanceof Error ? error.message : "state data failed";
