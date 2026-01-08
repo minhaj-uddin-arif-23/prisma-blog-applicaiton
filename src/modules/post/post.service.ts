@@ -1,10 +1,9 @@
+import { PostStatus } from "./../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-import {
-  CommentStatus,
-  Post,
-  PostStatus,
-} from "../../../generated/prisma/client";
+import { CommentStatus, Post } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
+import app from "../../app";
+import { UserRole } from "../../middleware/auth";
 const postService = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
   userId: string
@@ -395,6 +394,106 @@ const deletePost = async (
     },
   });
 };
+// * state SERVICE add to Dashboard
+// ? [totalPost,totalPublishd,draftPost,totalview]
+const stateService = async () => {
+  return await prisma.$transaction(async (tsx) => {
+    const [
+      totalPostCount,
+      totalPublishdPost,
+      totalDraftPost,
+      totalARCHIVEDPost,
+      totalViewPost,
+      totalCommentCount,
+      approveComment,
+      approveCommentReply,
+      rejectComment,
+      totalUser,
+      totalAdminUser,
+      totalModeratorUser,
+      totalVerifiedUser,
+      totalNotVerifiedUser,
+    ] = await Promise.all([
+      await tsx.post.count(),
+      await tsx.post.count({
+        where: {
+          status: PostStatus.PUBLISHED,
+        },
+      }),
+      await tsx.post.count({
+        where: {
+          status: PostStatus.DRAFT,
+        },
+      }),
+      await tsx.post.count({
+        where: {
+          status: PostStatus.ARCHIVED,
+        },
+      }),
+      await tsx.post.count(),
+      await tsx.comment.count(),
+      await tsx.comment.count({
+        where: {
+          status: CommentStatus.APPROVE,
+        },
+      }),
+      await tsx.comment.count({
+        where: {
+          replies: {
+            some: {
+              status: CommentStatus.APPROVE,
+            },
+          },
+        },
+      }),
+      await tsx.comment.count({
+        where: {
+          status: CommentStatus.REJECT,
+        },
+      }),
+      await tsx.user.count({}),
+      await tsx.user.count({
+        where: {
+          role: UserRole.ADMIN,
+        },
+      }),
+      await tsx.user.count({
+        where: {
+          role: UserRole.USER,
+        },
+      }),
+      await tsx.user.count({
+        where: {
+          emailVerified: true,
+        },
+      }),
+      await tsx.user.count({
+        where: {
+          emailVerified: false,
+        },
+      }),
+    ]);
+
+    return {
+      totalPost: totalPostCount,
+      total_published_post: totalPublishdPost,
+      total_draft_post: totalDraftPost,
+      total_archived_post: totalARCHIVEDPost,
+      total_view_of_post: totalViewPost,
+      total_comment_count: totalCommentCount,
+      approve_comment: approveComment,
+      approve_comment_reply: approveCommentReply,
+      reject_comment: rejectComment,
+      user: {
+        totalUser: totalUser,
+        totalAdminUser: totalAdminUser,
+        totalModeratorUser: totalModeratorUser,
+        totalVerifiedUser: totalVerifiedUser,
+        totalNotVerifiedUser: totalNotVerifiedUser,
+      },
+    };
+  });
+};
 
 export const PostService = {
   postService,
@@ -404,4 +503,5 @@ export const PostService = {
   getMyPostById,
   updatePostData,
   deletePost,
+  stateService,
 };

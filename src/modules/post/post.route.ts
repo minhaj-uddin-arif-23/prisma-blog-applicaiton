@@ -17,6 +17,7 @@ router.patch(
 );
 
 router.get("/", PostController.getController.getAllPosts);
+router.get("/state", PostController.statePost);
 
 router.post(
   "/addPost",

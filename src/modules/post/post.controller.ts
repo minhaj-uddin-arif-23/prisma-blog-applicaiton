@@ -287,6 +287,21 @@ const deletePost = async (req: Request, res: Response) => {
     });
   }
 };
+//* Dashboard data show info add
+const statePost = async (req: Request, res: Response) => {
+  try {
+    const data = await PostService.stateService();
+    return res.status(200).json({ data });
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : "state data failed";
+    res.status(400).json({ message: errorMessage });
+    return res.status(404).json({
+      success: false,
+      message: errorMessage,
+    });
+  }
+};
 
 export const PostController = {
   postController,
@@ -296,4 +311,5 @@ export const PostController = {
   getMyPost,
   updatePost,
   deletePost,
+  statePost,
 };
