@@ -262,6 +262,7 @@ const deleteSinglePost = async (id: string) => {
 };
 
 // * get my post
+// TODO PROBLEM OCCUR
 const getMyPostById = async (authorId: string) => {
   // * only active user user data get
   await prisma.user.findUniqueOrThrow({
@@ -351,6 +352,50 @@ const updatePostData = async (
   });
   return result;
 };
+
+// delete post
+
+/**
+ * USER ONYL delete own post
+ * admin can delete all post
+ * ------ step ----------
+ * find post
+ * check role
+ * then delete
+ **/
+
+const deletePost = async (
+  postId: string,
+  authorId: string,
+  isAdmin: boolean
+) => {
+  const findPost = await prisma.post.findFirst({
+    where: {
+      id: postId,
+    },
+    select: {
+      id: true,
+      authorId: true,
+    },
+  });
+
+  if (!findPost) {
+    throw new Error("Post not found");
+  }
+
+  // / check author id admin also edit post
+  if (!isAdmin && findPost.authorId !== authorId) {
+    throw new Error(
+      "You are not creator on this post . so you can not delete this post"
+    );
+  }
+  return await prisma.post.delete({
+    where: {
+      id: postId,
+    },
+  });
+};
+
 export const PostService = {
   postService,
   getAllPosts,
@@ -358,4 +403,5 @@ export const PostService = {
   deleteSinglePost,
   getMyPostById,
   updatePostData,
+  deletePost,
 };

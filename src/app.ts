@@ -22,4 +22,22 @@ app.get("/", (req, res) => {
   res.send("Hello, World! Hi there this is a good day.");
 });
 
+// * test code
+
+// app.get("/", (req, res) => {
+//   try {
+//     res.status(200).json({
+//       status: "ok",
+//       message: "Post service is healthy",
+//     });
+//   } catch (error) {
+//     console.error("Error in /post/health handler:", error);
+//     //  Always send a response, even on error
+//     res.status(500).json({
+//       status: "error",
+//       message: "Internal server error in /post/health",
+//     });
+//   }
+// });
+
 export default app;
