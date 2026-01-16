@@ -5,6 +5,7 @@ import { auth } from "./lib/auth";
 import cors from "cors";
 import { commentRouter } from "./modules/comment/comment.route";
 import errorHandler from "./middleware/globalErrorHandler";
+import { notFoundHandler } from "./middleware/notFoundError";
 const app: Application = express();
 // browser decide, which origin or url to access to data or request
 // need cors? -> if url doesn't match
@@ -22,7 +23,7 @@ app.use("/comment", commentRouter);
 app.get("/", (req, res) => {
   res.send("Hello, World! Hi there this is a good day.");
 });
-
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 export default app;

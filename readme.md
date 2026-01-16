@@ -14,3 +14,10 @@ Order You Should Write APIs
 2️⃣ POST → Create
 3️⃣ PATCH → Update (Preferred)
 4️⃣ DELETE → Remove (Dangerous)
+Validation issue? → PrismaClientValidationError
+Known DB issue (Pxxxx)? → PrismaClientKnownRequestError
+Unknown DB issue? → PrismaClientUnknownRequestError
+DB not reachable? → PrismaClientInitializationError
+Prisma crashed? → PrismaClientRustPanicError
+Prisma query took too long → PrismaClientTimeoutError
+--- IGNORE ---
