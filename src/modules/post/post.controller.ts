@@ -190,7 +190,7 @@ const getPostById = async (req: Request, res: Response) => {
   } catch (error) {}
 };
 // * update user post data
-const updatePost = async (req: Request, res: Response) => {
+const updatePost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     // console.log({ user });
@@ -204,13 +204,7 @@ const updatePost = async (req: Request, res: Response) => {
     );
     return res.status(200).json({ data });
   } catch (error: any) {
-    const errorMessage =
-      error instanceof Error ? error.message : "comment updated failed";
-    res.status(400).json({ message: errorMessage });
-    return res.status(404).json({
-      success: false,
-      message: errorMessage,
-    });
+    next(error);
   }
 };
 // delete

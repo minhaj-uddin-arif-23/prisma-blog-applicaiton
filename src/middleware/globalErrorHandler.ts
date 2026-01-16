@@ -10,21 +10,67 @@ function errorHandler(
   if (res.headersSent) {
     return next(err);
   }
+
   let statusCode = 500;
   let errorMessage = "Internal server error";
-  let errorDetails = err;
+  let errorDetails: any = undefined;
 
+  /* ---------- Prisma Validation Error ---------- */
   if (err instanceof Prisma.PrismaClientValidationError) {
-    (statusCode = 400), (errorMessage = "Missing filed or filed types");
+    statusCode = 400;
+    errorMessage = "Invalid request data (missing field or wrong type)";
+  } else if (err instanceof Prisma.PrismaClientKnownRequestError) {
+
+  /* ---------- Prisma Known Request Errors (with codes) ---------- */
+    switch (err.code) {
+      case "P2002":
+        statusCode = 409;
+        errorMessage = "Duplicate value already exists";
+        break;
+
+      case "P2025":
+        statusCode = 404;
+        errorMessage = "Record not found";
+        break;
+
+      case "P2003":
+        statusCode = 400;
+        errorMessage = "Foreign key constraint failed";
+        break;
+
+      case "P2024":
+        statusCode = 503;
+        errorMessage = "Database connection timeout";
+        break;
+
+      default:
+        statusCode = 400;
+        errorMessage = "Database request error";
+    }
+  } else if (err instanceof Prisma.PrismaClientInitializationError) {
+
+  /* ---------- Prisma DB Connection Error ---------- */
+    statusCode = 503;
+    errorMessage = "Database connection failed";
+  } else if (err.statusCode && err.message) {
+
+  /* ---------- Custom App Errors ---------- */
+    statusCode = err.statusCode;
+    errorMessage = err.message;
   }
 
-  res.status(statusCode);
+  /* ---------- Development Only Error Details ---------- */
+  if (process.env.NODE_ENV !== "production") {
+    errorDetails = err;
+  }
 
-  res.json({
+  res.status(statusCode).json({
+    success: false,
     message: errorMessage,
     error: errorDetails,
   });
 }
+
 export default errorHandler;
 
 /**
