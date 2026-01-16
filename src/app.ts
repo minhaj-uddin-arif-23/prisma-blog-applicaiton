@@ -4,6 +4,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
 import { commentRouter } from "./modules/comment/comment.route";
+import errorHandler from "./middleware/globalErrorHandler";
 const app: Application = express();
 // browser decide, which origin or url to access to data or request
 // need cors? -> if url doesn't match
@@ -22,22 +23,6 @@ app.get("/", (req, res) => {
   res.send("Hello, World! Hi there this is a good day.");
 });
 
-// * test code
-
-// app.get("/", (req, res) => {
-//   try {
-//     res.status(200).json({
-//       status: "ok",
-//       message: "Post service is healthy",
-//     });
-//   } catch (error) {
-//     console.error("Error in /post/health handler:", error);
-//     //  Always send a response, even on error
-//     res.status(500).json({
-//       status: "error",
-//       message: "Internal server error in /post/health",
-//     });
-//   }
-// });
+app.use(errorHandler);
 
 export default app;

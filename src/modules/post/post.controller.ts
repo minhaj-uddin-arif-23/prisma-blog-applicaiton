@@ -1,5 +1,5 @@
 import { SortOrder } from "./../../../generated/prisma/internal/prismaNamespaceBrowser";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
@@ -12,7 +12,7 @@ import { UserRole } from "../../middleware/auth";
     service call করবে
 */
 const postController = {
-  createPost: async (req: Request, res: Response) => {
+  createPost: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req?.user;
       if (!user) {
@@ -28,8 +28,7 @@ const postController = {
       );
       return res.status(201).json(postData);
     } catch (error) {
-      console.error("Error creating post:", error);
-      // res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   },
 };
